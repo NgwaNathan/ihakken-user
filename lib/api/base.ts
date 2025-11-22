@@ -18,3 +18,6 @@ export const baseQuery = fetchBaseQuery({
     return headers;
   },
 });
+
+export const BASE_API_URL = "http://192.168.1.55:8001/";
+

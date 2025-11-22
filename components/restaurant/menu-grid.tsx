@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { MenuItem } from "@/lib/types/interfaces";
 import Image from "next/image";
+import { BASE_API_URL } from "@/lib/api/base";
 
 interface MenuGridProps {
   items: MenuItem[];
@@ -59,7 +60,7 @@ export function MenuGrid({ items, branchId }: MenuGridProps) {
         const image = assignment.menuItem.images?.[0];
         const imageUrl = image.startsWith("http")
           ? image
-          : `${"http://192.168.1.55:8001"}${image}`;
+          : `${BASE_API_URL}${image}`;
 
         const prepTime = assignment.menuItem.prepTime;
 

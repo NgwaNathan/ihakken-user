@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { useDecodedPayload } from "@/hooks/useDecodedPayload";
 import { skipToken } from "@reduxjs/toolkit/query/react";
 import { MenuItem } from "@/lib/types/interfaces";
+import MenuItemDetailsPage from "@/app/branch/[branchId]/services/restaurant/[id]/page";
 
 interface RestaurantLayoutProps {
   branchId: string;
@@ -71,7 +72,9 @@ export function RestaurantLayout({ branchId }: RestaurantLayoutProps) {
 
       const matchesCategory =
         selectedCategoryId === "all" ||
-        assignment.menuItem.categories?.some((c) => c.id === selectedCategoryId);
+        assignment.menuItem.categories?.some(
+          (c) => c.id === selectedCategoryId
+        );
 
       const matchesSearch = name
         .toLowerCase()
@@ -94,11 +97,7 @@ export function RestaurantLayout({ branchId }: RestaurantLayoutProps) {
       {/* TOP BANNER + SEARCH */}
       <div className="sticky top-0 z-20">
         <div className="relative h-48 md:h-64 bg-linear-to-r from-teal-600 to-teal-800 overflow-hidden">
-          <img
-            src="/modern-restaurant-interior-with-elegant-dining.jpg"
-            alt="Restaurant"
-            className="w-full h-full object-cover opacity-60"
-          />
+          
           <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
           <div className="absolute inset-0 flex flex-col justify-between p-4">
             <div className="flex items-center gap-4">
@@ -210,12 +209,12 @@ export function RestaurantLayout({ branchId }: RestaurantLayoutProps) {
 
       {/* MOBILE SIDEBAR */}
       <CategorySidebar
-  menuItems={menuItemsRaw}
-  selectedCategoryId={selectedCategoryId}
-  onSelectCategory={(id: string) => setSelectedCategoryId(id)}
-  onClose={() => setIsSidebarOpen(false)}
-  isOpen={isSidebarOpen}
-/>
+        menuItems={menuItemsRaw}
+        selectedCategoryId={selectedCategoryId}
+        onSelectCategory={(id: string) => setSelectedCategoryId(id)}
+        onClose={() => setIsSidebarOpen(false)}
+        isOpen={isSidebarOpen}
+      />
 
 
     </div>
