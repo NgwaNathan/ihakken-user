@@ -4,6 +4,7 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import  RestaurantLayout  from "@/components/restaurant/layout";
+import { AiChatAssistant } from "@/components/restaurant/AiChatAssistant";
 
 interface DecodedPayload {
   branch: {
@@ -77,6 +78,10 @@ export default function RestaurantPage() {
       </div>
     );
   }
-
-  return <RestaurantLayout branchId={payloadData.branch.id} />;
+  return (
+    <>
+      <RestaurantLayout branchId={payloadData.branch.id} />
+      <AiChatAssistant />
+    </>
+  );
 }

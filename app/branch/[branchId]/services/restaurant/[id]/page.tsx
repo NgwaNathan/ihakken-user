@@ -555,6 +555,7 @@ export default function MenuItemDetailsPage() {
           </Button>
         </div>
       </div>
+
     </div>
   );
 }
