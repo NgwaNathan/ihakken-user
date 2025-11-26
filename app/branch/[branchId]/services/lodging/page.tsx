@@ -5,6 +5,10 @@ export const metadata = {
   description: "Find your perfect accommodation at Serenity Hub",
 }
 
-export default function LodgingPage() {
-  return <LodgingLayout />
+export default function LodgingPage({
+  params,
+}: {
+  params: { branchId: string }
+}) {
+  return <LodgingLayout branchId={params.branchId} />
 }

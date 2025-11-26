@@ -51,7 +51,12 @@ export function AccommodationGrid({ accommodations }: AccommodationGridProps) {
         }`;
 
         return (
-          <Link key={accommodation.id} href={href}>
+           <Link 
+                    key={accommodation.id}
+                    href={`/branch/${branchId}/services/lodging/${accommodation.id}${
+                      payload ? `?payload=${payload}` : "" 
+                    }`}
+                  >
             <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer h-full">
               <div className="relative h-48 overflow-hidden bg-muted">
                 {image ? (

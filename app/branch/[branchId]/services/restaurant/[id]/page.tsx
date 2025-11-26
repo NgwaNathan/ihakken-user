@@ -33,20 +33,26 @@ export default function MenuItemDetailsPage() {
 
   // State for quantities
   const [mainQuantity, setMainQuantity] = useState(1);
-  const [selectedAddOns, setSelectedAddOns] = useState<Record<string, number>>({});
-  const [selectedToppings, setSelectedToppings] = useState<Record<string, number>>({});
-  const [selectedComplements, setSelectedComplements] = useState<Record<string, number>>({});
+  const [selectedAddOns, setSelectedAddOns] = useState<Record<string, number>>(
+    {}
+  );
+  const [selectedToppings, setSelectedToppings] = useState<
+    Record<string, number>
+  >({});
+  const [selectedComplements, setSelectedComplements] = useState<
+    Record<string, number>
+  >({});
 
   // Get decoded payload to find serviceId
   const { data: decoded, loading: payloadLoading } = useDecodedPayload(payload);
 
   const serviceId = decoded?.services.find(
-    (s) => s.service_type.toLowerCase() === "restaurant"
+    (s: any) => s.service_type.toLowerCase() === "restaurant"
   )?.id;
 
   // Create stable query argument to prevent unnecessary re-renders
-  const stableMenuQueryArg = useMemo(() => 
-    serviceId ? { serviceId } : skipToken,
+  const stableMenuQueryArg = useMemo(
+    () => (serviceId ? { serviceId } : skipToken),
     [serviceId]
   );
 
@@ -54,31 +60,20 @@ export default function MenuItemDetailsPage() {
   useGetMenuItemsQuery(stableMenuQueryArg);
 
   // Create memoized selector to get specific menu item from cache
-  const selectMenuItemById = useMemo(() =>
-    createSelector(
-      [restaurantApi.endpoints.getMenuItems.select(stableMenuQueryArg)],
-      (result) => {
-        const items = result?.data?.data || [];
-        return items.find((item: MenuItem) => item.id === itemId);
-      }
-    ),
+  const selectMenuItemById = useMemo(
+    () =>
+      createSelector(
+        [restaurantApi.endpoints.getMenuItems.select(stableMenuQueryArg)],
+        (result) => {
+          const items = result?.data?.data || [];
+          return items.find((item: MenuItem) => item.id === itemId);
+        }
+      ),
     [stableMenuQueryArg, itemId]
   );
 
   // Get the menu item from cache using selector
   const menuAssignment = useSelector(selectMenuItemById);
-
-  const getCurrencySymbol = (code: string) => {
-    const symbols: Record<string, string> = {
-      USD: "$",
-      EUR: "€",
-      GBP: "£",
-      CHF: "CHF",
-      XAF: "FCFA",
-      USS: "$",
-    };
-    return symbols[code] || code;
-  };
 
   const updateQuantity = (
     type: "addOns" | "toppings" | "complements",
@@ -126,9 +121,8 @@ export default function MenuItemDetailsPage() {
   }
 
   const { menuItem, customPrice, currency, customizations } = menuAssignment;
-  const currencySymbol = currency?.[0]
-    ? getCurrencySymbol(currency[0].code)
-    : "$";
+  const currencySymbol = currency?.[0]?.code || "";
+
   const price = customPrice || menuItem.price;
   const mainImage = menuItem.images?.[0];
   const imageUrl = mainImage?.startsWith("http")
@@ -142,10 +136,20 @@ export default function MenuItemDetailsPage() {
   const complements = customizations?.[0]?.complementsCustomizations || [];
 
   // Calculate quantities and totals
-  const totalAddOns = Object.values(selectedAddOns).reduce((sum, qty) => sum + qty, 0);
-  const totalToppings = Object.values(selectedToppings).reduce((sum, qty) => sum + qty, 0);
-  const totalComplements = Object.values(selectedComplements).reduce((sum, qty) => sum + qty, 0);
-  const totalItems = mainQuantity + totalAddOns + totalToppings + totalComplements;
+  const totalAddOns = Object.values(selectedAddOns).reduce(
+    (sum, qty) => sum + qty,
+    0
+  );
+  const totalToppings = Object.values(selectedToppings).reduce(
+    (sum, qty) => sum + qty,
+    0
+  );
+  const totalComplements = Object.values(selectedComplements).reduce(
+    (sum, qty) => sum + qty,
+    0
+  );
+  const totalItems =
+    mainQuantity + totalAddOns + totalToppings + totalComplements;
 
   // Calculate total price
   const mainPrice = price * mainQuantity;
@@ -156,12 +160,15 @@ export default function MenuItemDetailsPage() {
   );
   const toppingsPrice = toppings.reduce(
     (sum: number, topping: CustomizationItem) =>
-      sum + parseFloat(topping.extraPrice) * (selectedToppings[topping.id] || 0),
+      sum +
+      parseFloat(topping.extraPrice) * (selectedToppings[topping.id] || 0),
     0
   );
   const complementsPrice = complements.reduce(
     (sum: number, complement: CustomizationItem) =>
-      sum + parseFloat(complement.extraPrice) * (selectedComplements[complement.id] || 0),
+      sum +
+      parseFloat(complement.extraPrice) *
+        (selectedComplements[complement.id] || 0),
     0
   );
   const totalPrice = mainPrice + addOnsPrice + toppingsPrice + complementsPrice;
@@ -224,11 +231,15 @@ export default function MenuItemDetailsPage() {
                     variant="ghost"
                     size="icon"
                     className="h-6 w-6"
-                    onClick={() => setMainQuantity(Math.max(1, mainQuantity - 1))}
+                    onClick={() =>
+                      setMainQuantity(Math.max(1, mainQuantity - 1))
+                    }
                   >
                     <Minus className="w-4 h-4" />
                   </Button>
-                  <span className="w-8 text-center font-semibold">{mainQuantity}</span>
+                  <span className="w-8 text-center font-semibold">
+                    {mainQuantity}
+                  </span>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -291,7 +302,9 @@ export default function MenuItemDetailsPage() {
               <div>
                 <CardTitle className="text-base">Add-ons</CardTitle>
                 <CardDescription>
-                  {totalAddOns > 0 ? `${totalAddOns} selected` : "Extra items you can add"}
+                  {totalAddOns > 0
+                    ? `${totalAddOns} selected`
+                    : "Extra items you can add"}
                 </CardDescription>
               </div>
             </CardHeader>
@@ -331,7 +344,11 @@ export default function MenuItemDetailsPage() {
                       size="icon"
                       className="h-5 w-5"
                       onClick={() =>
-                        updateQuantity("addOns", addon.id, (selectedAddOns[addon.id] || 0) - 1)
+                        updateQuantity(
+                          "addOns",
+                          addon.id,
+                          (selectedAddOns[addon.id] || 0) - 1
+                        )
                       }
                     >
                       <Minus className="w-3 h-3" />
@@ -344,7 +361,11 @@ export default function MenuItemDetailsPage() {
                       size="icon"
                       className="h-5 w-5"
                       onClick={() =>
-                        updateQuantity("addOns", addon.id, (selectedAddOns[addon.id] || 0) + 1)
+                        updateQuantity(
+                          "addOns",
+                          addon.id,
+                          (selectedAddOns[addon.id] || 0) + 1
+                        )
                       }
                     >
                       <Plus className="w-3 h-3" />
@@ -363,7 +384,9 @@ export default function MenuItemDetailsPage() {
               <div>
                 <CardTitle className="text-base">Toppings</CardTitle>
                 <CardDescription>
-                  {totalToppings > 0 ? `${totalToppings} selected` : "Extra toppings for your meal"}
+                  {totalToppings > 0
+                    ? `${totalToppings} selected`
+                    : "Extra toppings for your meal"}
                 </CardDescription>
               </div>
             </CardHeader>
@@ -405,7 +428,11 @@ export default function MenuItemDetailsPage() {
                       size="icon"
                       className="h-5 w-5"
                       onClick={() =>
-                        updateQuantity("toppings", topping.id, (selectedToppings[topping.id] || 0) - 1)
+                        updateQuantity(
+                          "toppings",
+                          topping.id,
+                          (selectedToppings[topping.id] || 0) - 1
+                        )
                       }
                     >
                       <Minus className="w-3 h-3" />
@@ -418,7 +445,11 @@ export default function MenuItemDetailsPage() {
                       size="icon"
                       className="h-5 w-5"
                       onClick={() =>
-                        updateQuantity("toppings", topping.id, (selectedToppings[topping.id] || 0) + 1)
+                        updateQuantity(
+                          "toppings",
+                          topping.id,
+                          (selectedToppings[topping.id] || 0) + 1
+                        )
                       }
                     >
                       <Plus className="w-3 h-3" />
@@ -437,7 +468,9 @@ export default function MenuItemDetailsPage() {
               <div>
                 <CardTitle className="text-base">Complements</CardTitle>
                 <CardDescription>
-                  {totalComplements > 0 ? `${totalComplements} selected` : "Side dishes and accompaniments"}
+                  {totalComplements > 0
+                    ? `${totalComplements} selected`
+                    : "Side dishes and accompaniments"}
                 </CardDescription>
               </div>
             </CardHeader>
@@ -479,7 +512,11 @@ export default function MenuItemDetailsPage() {
                       size="icon"
                       className="h-5 w-5"
                       onClick={() =>
-                        updateQuantity("complements", complement.id, (selectedComplements[complement.id] || 0) - 1)
+                        updateQuantity(
+                          "complements",
+                          complement.id,
+                          (selectedComplements[complement.id] || 0) - 1
+                        )
                       }
                     >
                       <Minus className="w-3 h-3" />
@@ -492,7 +529,11 @@ export default function MenuItemDetailsPage() {
                       size="icon"
                       className="h-5 w-5"
                       onClick={() =>
-                        updateQuantity("complements", complement.id, (selectedComplements[complement.id] || 0) + 1)
+                        updateQuantity(
+                          "complements",
+                          complement.id,
+                          (selectedComplements[complement.id] || 0) + 1
+                        )
                       }
                     >
                       <Plus className="w-3 h-3" />
@@ -544,16 +585,6 @@ export default function MenuItemDetailsPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Add to Cart Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4">
-        <div className="max-w-2xl mx-auto">
-          <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white py-6 text-lg font-semibold">
-            Add to Cart - {currencySymbol}
-            {totalPrice.toLocaleString()}
-          </Button>
-        </div>
       </div>
     </div>
   );

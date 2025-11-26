@@ -22,30 +22,48 @@ export interface Amenity {
   icon?: string;
 }
 
-export interface Accommodation {
-  id: string;
-  lodge: string;
+export interface FloorData {
   floor: string;
-  type: string;
-  typeName: string;
-  code: string;
-  description?: string;
-  available: boolean;
-  pricePerNight?: string;
-  maxGuests?: number;
-  recommendedGuests?: number;
-  roomSize?: number;
-  nRooms?: number;
-  nBeds?: number;
-  nBaths?: number;
-  childrenAllowed?: boolean;
-  bedConfiguration?: string;
-  amenities: Amenity[];
-  mainImage?: { id: string; url: string }[];
-  created_at: string;
-  updated_at: string;
+  floorName: string;
+  accommodations: Accommodation[];
 }
 
+export interface Accommodation {
+  id: string;
+  code: string;
+  type: string;
+  typeName: string;
+  category: string;
+  description?: string;
+  available: boolean;
+  currency: Array<{ id: number; name: string; code: string }>;
+  pricePerNight: string
+  amenities: Amenity[];
+  maxGuests: number;
+  recommendedGuests: number;
+  roomSize: number;
+  nRooms: number;
+  nBeds: number;
+  nBaths: number;
+  childrenAllowed: boolean;
+  bedConfiguration: string;
+  mainImage?: { id: string; url: string }[];
+  // Remove floor property since it comes from parent FloorData
+}
+
+export interface LodgingApiResponse {
+  erc: number;
+  msg: string;
+  total: number;
+  next: null;
+  data: {
+    erc: number;
+    msg: string;
+    total: number;
+    next: null;
+    data: FloorData[];
+  };
+}
 export interface CustomizationItem {
   id: string;
   ingredientName?: string;
