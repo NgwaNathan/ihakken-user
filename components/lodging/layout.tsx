@@ -10,6 +10,8 @@ import { AccommodationGrid } from "./accommodation-grid";
 import { useGetAccommodationsQuery } from "@/lib/api/lodging";
 import { useDeferredValue } from "react";
 import { useDecodedPayload } from "@/hooks/useDecodedPayload";
+import { Accommodation } from "@/lib/types/interfaces";
+import { CallServiceModal } from "./serviceModal";
 
 interface LodgingLayoutProps {
   branchId: string;
@@ -21,6 +23,8 @@ export function LodgingLayout({ branchId }: LodgingLayoutProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: decoded, loading: payloadLoading } = useDecodedPayload(payload);
+    const [callModalOpen, setCallModalOpen] = useState(false);
+
 
   useEffect(() => {
     if (!decoded) return;
@@ -37,7 +41,7 @@ export function LodgingLayout({ branchId }: LodgingLayoutProps) {
   )?.id;
 
   const {
-    data: accommodations = [],
+    data: accommodations = [] as Accommodation[],
     isLoading: loading,
     error,
   } = useGetAccommodationsQuery(branchId);
@@ -135,22 +139,10 @@ export function LodgingLayout({ branchId }: LodgingLayoutProps) {
             </Button>
           </div>
         </div>
-      </div>
-
+      </div> 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="mb-4 p-4 bg-gray-100 rounded">
-          <p className="text-xs">Debug Info:</p>
-          <p className="text-xs">
-            Total accommodations: {accommodations?.length || 0}
-          </p>
-          <p className="text-xs">
-            Filtered: {filteredAccommodations?.length || 0}
-          </p>
-          <p className="text-xs">Search query: "{searchQuery}"</p>
-        </div>
-
         {filteredAccommodations.length > 0 ? (
-          <AccommodationGrid accommodations={filteredAccommodations} />
+          <AccommodationGrid accommodations ={filteredAccommodations} />
         ) : (
           <div className="text-center py-10">
             <p className="text-muted-foreground">No accommodations found</p>
@@ -162,6 +154,7 @@ export function LodgingLayout({ branchId }: LodgingLayoutProps) {
           </div>
         )}
       </div>
+     
     </div>
   );
 }

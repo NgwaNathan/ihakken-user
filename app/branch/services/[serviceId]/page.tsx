@@ -92,15 +92,7 @@ export default function ServicePage() {
           )
         )}
 
-        {/* Debug section */}
-        <details className="mt-8 bg-gray-50 p-4 rounded">
-          <summary className="font-mono text-sm cursor-pointer">
-            Show Debug Info
-          </summary>
-          <pre className="mt-2 text-xs overflow-auto">
-            {JSON.stringify({ payloadData, transformedServices }, null, 2)}
-          </pre>
-        </details>
+       
       </div>
     </div>
   );
