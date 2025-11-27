@@ -76,6 +76,9 @@ export default function MenuItemDetailsPage() {
   // Get the menu item from cache using selector
   const menuAssignment = useSelector(selectMenuItemById);
 
+  // If live data isn't found from the cache, try to find the item in our mock data.
+  const finalMenuAssignment = menuAssignment || mockMenuItemsData.find(item => item.id === itemId);
+
   const updateQuantity = (
     type: "addOns" | "toppings" | "complements",
     id: string,
@@ -121,7 +124,7 @@ export default function MenuItemDetailsPage() {
     );
   }
 
-  const { menuItem, customPrice, currency, customizations } = menuAssignment;
+  const { menuItem, customPrice, currency, customizations } = finalMenuAssignment;
   const currencySymbol = currency?.[0]?.code || "";
 
   const price = customPrice || menuItem.price;

@@ -153,8 +153,8 @@ export function AiChatAssistant({ branchId, payload }: AiChatAssistantProps) {
       {/* The Chat Window */}
       {isChatOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 pb-16">
-          <Card className="w-[90vw] max-w-3xl shadow-xl border-teal-200 flex flex-col">
-            <CardHeader className="flex flex-row items-center justify-between bg-muted p-3">
+          <Card className="w-[90vw] max-w-3xl shadow-xl border-teal-200 flex flex-col py-0 border-2 ">
+            <CardHeader className="flex flex-row items-center justify-between bg-muted px-4 py-2 rounded-t-lg"> 
               <div className="flex items-center gap-2">
                 <Bot className="h-6 w-6 text-teal-600" />
                 <CardTitle className="text-base">AI Assistant</CardTitle>
@@ -186,7 +186,13 @@ export function AiChatAssistant({ branchId, payload }: AiChatAssistantProps) {
                         )}
                         <div className="flex overflow-x-auto gap-3 p-2 -mx-2"> {/* Added padding and negative margin to make scrollbar visible */}
                           {msg.menuItems.map((item) => (
-                            <MenuItemCard key={item.id} item={item} branchId={branchId} payload={payload} />
+                            <MenuItemCard
+                              key={item.id}
+                              item={item}
+                              branchId={branchId}
+                              payload={payload}
+                              className="w-[180px] flex-shrink-0"
+                            />
                           ))}
                         </div>
                       </div>
