@@ -6,15 +6,11 @@ import { useParams, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import AccommodationDetailsClient from "@/app/branch/services/[serviceId]/accommodation-details-client"
 
-// ------------------------------------------------------
-// FIXED: Base64URL → Base64 decoder for JWT payload
-// ------------------------------------------------------
 function decodePayload(payload: string) {
   try {
     const base64Url = payload.split(".")[1]
     if (!base64Url) return null
 
-    // Convert Base64URL → Base64
     const base64 = base64Url
       .replace(/-/g, "+")
       .replace(/_/g, "/")
@@ -48,10 +44,6 @@ export default function ItemDetailsPage() {
       }
     }
   }, [searchParams])
-
-  // ------------------------------------------------------
-  // If branchId invalid → show error page
-  // ------------------------------------------------------
   if (!branchId) {
     return (
       <main className="min-h-screen bg-linear-to-br from-white via-green-50 to-white">
@@ -63,10 +55,6 @@ export default function ItemDetailsPage() {
       </main>
     )
   }
-
-  // ------------------------------------------------------
-  // Lodging page
-  // ------------------------------------------------------
   if (serviceId === "lodging") {
     return (
       <main className="min-h-screen bg-linear-to-br from-white via-green-50 to-white">
@@ -79,10 +67,6 @@ export default function ItemDetailsPage() {
       </main>
     )
   }
-
-  // ------------------------------------------------------
-  // Default service page
-  // ------------------------------------------------------
   return (
     <main className="min-h-screen">
       <Header />
