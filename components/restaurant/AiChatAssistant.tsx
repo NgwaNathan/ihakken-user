@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Bot, Send, X } from "lucide-react";
+import { Bot, Send, X, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,12 +11,37 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
+import { mockMenuItemsData } from "@/components/restaurant/menu-items";
+import { MenuItemCard } from "./MenuItemCard";
 
-export function AiChatAssistant() {
+// Define the type for a menu item as it will be displayed in the chat
+interface AIChatMenuItem {
+  id: string;
+  name: string;
+  shortDescription?: string;
+  price: number;
+  currencyCode: string; // e.g., "USD"
+  imageUrl?: string;
+  prepTime?: number; // in minutes
+}
+
+// Define the type for a chat message, now supporting menu items
+interface ChatMessage {
+  text?: string; // Make text optional
+  sender: "user" | "ai";
+  menuItems?: AIChatMenuItem[]; // New optional field for displaying menu items
+}
+
+interface AiChatAssistantProps {
+  branchId: string;
+  payload: string;
+}
+export function AiChatAssistant({ branchId, payload }: AiChatAssistantProps) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isInputActive, setIsInputActive] = useState(false);
   const [messages, setMessages] = useState<
-    { text: string; sender: "user" | "ai" }[]
+    ChatMessage[]
   >([{
       text: "Hello! 👋 I'm your smart menu assistant. Ask me anything about our dishes, ingredients, prices, or allergens..",
       sender: "ai",
@@ -36,6 +61,18 @@ export function AiChatAssistant() {
     "I can certainly help with that. To place a delivery order, please use the 'Checkout' button in your cart."
   ];
 
+  // Mock menu items for demonstration
+  // Map the detailed mock data to the simpler format needed for the chat cards.
+  const mockMenuItems: AIChatMenuItem[] = mockMenuItemsData.map(item => ({
+    id: item.id,
+    name: item.menuItem.name,
+    shortDescription: item.menuItem.shortDescription,
+    price: item.menuItem.price,
+    currencyCode: item.currency?.[0]?.code || "USD",
+    imageUrl: item.menuItem.images?.[0],
+    prepTime: item.menuItem.prepTime,
+  }));
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -43,6 +80,20 @@ export function AiChatAssistant() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isThinking]);
+
+  // Prevent background scrolling when chat is open
+  useEffect(() => {
+    if (isChatOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to restore scroll on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isChatOpen]);
 
   const toggleChat = () => setIsChatOpen(!isChatOpen);
 
@@ -56,17 +107,26 @@ export function AiChatAssistant() {
     }, 300);
   };
 
-   const sendMessage = () => {
+  const sendMessage = () => {
     if (currentInput.trim()) {
-      const userMessage = { text: currentInput, sender: 'user' as const };
+      const userMessage: ChatMessage = { text: currentInput, sender: 'user' };
       setMessages((prevMessages) => [...prevMessages, userMessage]);
       setCurrentInput("");
       setIsThinking(true);
+
+      const lowerCaseInput = currentInput.toLowerCase();
+      const isMenuRequest = lowerCaseInput.includes("menu") || lowerCaseInput.includes("dishes") || lowerCaseInput.includes("items") || lowerCaseInput.includes("food");
+
       setTimeout(() => {
-        const randomReply = mockReplies[Math.floor(Math.random() * mockReplies.length)];
-        const aiMessage = { text: randomReply, sender: 'ai' as const };
+        let aiMessage: ChatMessage;
+        if (isMenuRequest) {
+          aiMessage = { text: "Here are some of our popular menu items:", sender: 'ai', menuItems: mockMenuItems };
+        } else {
+          const randomReply = mockReplies[Math.floor(Math.random() * mockReplies.length)];
+          aiMessage = { text: randomReply, sender: 'ai' };
+        }
         setMessages((prevMessages) => [...prevMessages, aiMessage]);
-              setIsThinking(false);
+        setIsThinking(false);
       }, 1500); 
     }
   };
@@ -115,35 +175,35 @@ export function AiChatAssistant() {
             >
               <div className="space-y-3">
                 {messages.map((msg, index) => (
-                  <div
-                    key={index} 
-                    className={`flex ${
-                      msg.sender === "user" ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    <div
-                      className={`max-w-[80%] p-2 rounded-lg ${
-                        msg.sender === "user"
-                          ? "bg-teal-600 text-white"
-                          : "bg-muted text-foreground"
-                      }`}
-                    >
-                      {msg.text}
-                    </div>
+                  <div key={index} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
+                    {msg.menuItems ? (
+                      // Render menu items if present
+                      <div className="flex flex-col gap-2 max-w-[90%]">
+                        {msg.text && (
+                          <div className="p-2 rounded-lg bg-muted text-foreground">
+                            {msg.text}
+                          </div>
+                        )}
+                        <div className="flex overflow-x-auto gap-3 p-2 -mx-2"> {/* Added padding and negative margin to make scrollbar visible */}
+                          {msg.menuItems.map((item) => (
+                            <MenuItemCard key={item.id} item={item} branchId={branchId} payload={payload} />
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      // Render text message as before
+                      <div
+                        className={`max-w-[80%] p-2 rounded-lg ${
+                          msg.sender === "user"
+                            ? "bg-teal-600 text-white"
+                            : "bg-muted text-foreground"
+                        }`}
+                      >
+                        {msg.text}
+                      </div>
+                    )}
                   </div>
                 ))}
-                  {isThinking && (
-      <div className="flex justify-start">
-        <div className="max-w-[80%] p-2 rounded-lg bg-muted text-foreground">
-          Thinking
-          <span className="dot-animation">
-            <span>.</span>
-            <span>.</span>
-            <span>.</span>
-          </span>
-        </div>
-      </div>
-    )}
                 <div ref={messagesEndRef} />
               </div>
             </CardContent>

@@ -40,6 +40,7 @@ export default function RestaurantPage() {
 
   useEffect(() => {
     const payload = searchParams.get("payload");
+    if (!payload) setIsLoading(false); // Ensure loading stops if no payload
 
     if (payload) {
       const data = decodePayload(payload);
@@ -78,10 +79,13 @@ export default function RestaurantPage() {
       </div>
     );
   }
+
+  const payload = searchParams.get("payload") || "";
+
   return (
     <>
       <RestaurantLayout branchId={payloadData.branch.id} />
-      <AiChatAssistant />
+      <AiChatAssistant branchId={payloadData.branch.id} payload={payload} />
     </>
   );
 }

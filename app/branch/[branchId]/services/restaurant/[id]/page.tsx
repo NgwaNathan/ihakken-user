@@ -21,6 +21,7 @@ import Image from "next/image";
 import { MenuItem } from "@/lib/types/interfaces";
 import { restaurantApi } from "@/lib/api/restaurant";
 import { CustomizationItem } from "@/lib/types/interfaces";
+import { mockMenuItemsData } from "@/components/restaurant/menu-items";
 import { BASE_API_URL } from "@/lib/api/base";
 
 export default function MenuItemDetailsPage() {
@@ -68,7 +69,11 @@ export default function MenuItemDetailsPage() {
   // Get the menu item from cache using selector
   const menuAssignment = useSelector(selectMenuItemById);
 
-  const getCurrencySymbol = (code: string) => {
+  // If live data isn't found, try to find it in our mock data.
+  const finalMenuAssignment = menuAssignment || mockMenuItemsData.find(item => item.id === itemId);
+
+
+    const getCurrencySymbol = (code: string) => {
     const symbols: Record<string, string> = {
       USD: "$",
       EUR: "€",
@@ -108,7 +113,7 @@ export default function MenuItemDetailsPage() {
     );
   }
 
-  if (!menuAssignment) {
+  if (!finalMenuAssignment) {
     return (
       <div className="min-h-screen bg-background p-4">
         <div className="max-w-2xl mx-auto text-center pt-20">
@@ -125,7 +130,7 @@ export default function MenuItemDetailsPage() {
     );
   }
 
-  const { menuItem, customPrice, currency, customizations } = menuAssignment;
+  const { menuItem, customPrice, currency, customizations } = finalMenuAssignment;
   const currencySymbol = currency?.[0]
     ? getCurrencySymbol(currency[0].code)
     : "$";
